@@ -57,15 +57,18 @@ public class Eternity2 {
         if(token.isEmpty()) token = null;
         System.out.println("please enter a run command (e.g. java -jar eternity2.jar)");
         String runCmd = sc.nextLine();
+        System.out.println("please enter your restart time in minutes (negative = no restart).");
+        long restartTime = sc.nextLong()*60*1000; //*60-> seconds *1000-> milliseconds
         System.out.println("please confirm these are correct:");
         System.out.println("remote: " +remote);
         System.out.println("local: " + localLoc);
         System.out.println("token: " + token);
         System.out.println("runCmd: " + runCmd);
+        System.out.println("restartTime: " + restartTime+"ms");
         System.out.println("y/n");
         String input = sc.nextLine();
         if(input.toLowerCase().trim().equals("y")){
-            App app = new App(remote, localLoc, token, runCmd);
+            App app = new App(remote, localLoc, token, runCmd, restartTime);
             AppManager.instance.addApp(app);
             app.init();
             return;

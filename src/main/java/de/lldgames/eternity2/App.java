@@ -11,12 +11,15 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class App {
     private String remoteURL;
     private String localLocation;
     private String authentication;
     private String runCmd;
+    private long restartTime = -1; //in milliseconds
     @JsonIgnore
     private Process process;
     @JsonIgnore
@@ -25,6 +28,10 @@ public class App {
     private AppPullListener pl;
     @JsonIgnore
     private AppIO io;
+    @JsonIgnore
+    private Timer timer;
+    @JsonIgnore
+    private boolean restartLoopRunning = false;
 
     public App(){}
 
@@ -33,12 +40,15 @@ public class App {
             @JsonProperty("remoteURL") String remoteURL,
             @JsonProperty("localLocation") String localLocation,
             @JsonProperty("authentication") String authentication,
-            @JsonProperty("runCmd") String runCmd
+            @JsonProperty("runCmd") String runCmd,
+            @JsonProperty("restartTime") long restartTime
     ) {
         this.remoteURL = remoteURL;
         this.localLocation = localLocation;
         this.authentication = authentication;
         this.runCmd = runCmd;
+        this.restartTime = restartTime;
+        this.timer = new Timer();
     }
 
     public String getRemoteURL(){
@@ -64,13 +74,33 @@ public class App {
         this.start();
     }
 
+    public void restart(){
+        this.stop();
+        this.start();
+    }
+
+    private void startRestartTimer(){
+        if(this.restartTime <0) return;
+        if(this.restartLoopRunning) return;
+        //this.timer.cancel();
+        //this.timer = new Timer();
+        TimerTask t = new TimerTask() {
+            @Override
+            public void run() {
+                App.this.restart();
+            }
+        };
+        this.timer.scheduleAtFixedRate(t, restartTime, restartTime);
+        this.restartLoopRunning = true;
+    }
+
     public void pull(){
         try {
             PullCommand cmd= this.repo.pull();
 
             if(this.authentication!=null) cmd.setCredentialsProvider(new UsernamePasswordCredentialsProvider("token", this.authentication));
 
-                    cmd.call();
+            cmd.call();
         } catch (GitAPIException e) {
             throw new RuntimeException(e);
         }
@@ -142,6 +172,7 @@ public class App {
         }catch (Exception e){
             e.printStackTrace();
         }
+        this.startRestartTimer();
     }
 
     public void stop(){
