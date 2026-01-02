@@ -1,7 +1,10 @@
 package de.lldgames.eternity2;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import tools.jackson.core.json.JsonFactory;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +14,10 @@ import java.util.Scanner;
 
 public class AppManager {
     @JsonIgnore
-    public static final ObjectMapper mapper = new ObjectMapper();
+    public static final ObjectMapper mapper = new JsonMapper.Builder(new JsonFactory())
+            .disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+            .build()
+            ;
     @JsonIgnore
     public static AppManager instance;
     public List<App> apps = new ArrayList<>();
@@ -20,7 +26,9 @@ public class AppManager {
 
     public static void load(){
         if(new File("./config.json").exists()) {
-            AppManager mngr = mapper.readValue(new File("./config.json"), AppManager.class);
+            //var conf = mapper.deserializationConfig().without(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+            AppManager mngr = mapper
+                    .readValue(new File("./config.json"), AppManager.class);
             instance = mngr;
         }else {
             System.out.println("config.json not found!");

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Main-Class: de.lldgames.eternity2.Eternity2
+Class-Path: jackson-databind-3.0.3.jar commons-codec-1.20.0.jar JavaEWAH
+ -1.2.3.jar slf4j-api-2.0.17.jar Java-WebSocket-1.6.0.jar jackson-annota
+ tions-2.20.jar org.eclipse.jgit-7.5.0.202512021534-r.jar jackson-core-3
+ .0.3.jar
+

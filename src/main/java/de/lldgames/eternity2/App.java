@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.lldgames.eternity2.io.AppIO;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
@@ -17,7 +15,8 @@ import java.util.TimerTask;
 public class App {
     private String remoteURL;
     private String localLocation;
-    private String authentication;
+    //private String authentication;
+    private String username;
     private String runCmd;
     private long restartTime = -1; //in milliseconds
     @JsonIgnore
@@ -34,7 +33,7 @@ public class App {
     private boolean restartLoopRunning = false;
 
     public App(){}
-
+/*
     @JsonCreator
     public App(
             @JsonProperty("remoteURL") String remoteURL,
@@ -50,7 +49,16 @@ public class App {
         this.restartTime = restartTime;
         this.timer = new Timer();
     }
+*/
 
+    public App(String remoteURL, String localLocation, String username, String runCmd, long restartTime){
+        this.remoteURL = remoteURL;
+        this.localLocation = localLocation;
+        this.username = username;
+        this.runCmd = runCmd;
+        this.restartTime = restartTime;
+        this.timer = new Timer();
+    }
     public String getRemoteURL(){
         return this.remoteURL;
     }
@@ -98,8 +106,7 @@ public class App {
         try {
             PullCommand cmd= this.repo.pull();
 
-            if(this.authentication!=null) cmd.setCredentialsProvider(new UsernamePasswordCredentialsProvider("token", this.authentication));
-
+            addCredentialsManager(cmd);
             cmd.call();
         } catch (GitAPIException e) {
             throw new RuntimeException(e);
@@ -110,8 +117,8 @@ public class App {
         return localLocation;
     }
 
-    public String getAuthentication() {
-        return authentication;
+    public String getUsername() {
+        return username;
     }
 
     public String getRunCmd() {
@@ -135,13 +142,20 @@ public class App {
         start();
     }
 
+    private <T extends TransportCommand> T addCredentialsManager(T c){
+        if(this.username!=null && Eternity2.authManager.getToken(username)!=null)
+            c.setCredentialsProvider(
+                    new UsernamePasswordCredentialsProvider(
+                            username, Eternity2.authManager.getToken(username)));
+        return c;
+    }
+
     private void cloneRepo(){
         try {
             CloneCommand c = Git.cloneRepository()
                     .setURI(this.remoteURL)
                     .setDirectory(new File(this.localLocation));
-            if(this.authentication!=null) c.setCredentialsProvider(new UsernamePasswordCredentialsProvider("token", this.authentication));
-
+            this.addCredentialsManager(c);
             try(Git git = c.call()){
                 this.repo = git;
             }

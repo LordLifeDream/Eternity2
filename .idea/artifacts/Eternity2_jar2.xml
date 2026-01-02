@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="Eternity2:jar2">
+    <output-path>$PROJECT_DIR$/out/</output-path>
+    <root id="root">
+      <element id="archive" name="Eternity2.jar">
+        <element id="module-output" name="Eternity2" />
+      </element>
+      <element id="library" level="project" name="Maven: tools.jackson.core:jackson-databind:3.0.3" />
+      <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.20.0" />
+      <element id="library" level="project" name="Maven: com.googlecode.javaewah:JavaEWAH:1.2.3" />
+      <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:2.0.17" />
+      <element id="library" level="project" name="Maven: org.java-websocket:Java-WebSocket:1.6.0" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.20" />
+      <element id="library" level="project" name="Maven: org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r" />
+      <element id="library" level="project" name="Maven: tools.jackson.core:jackson-core:3.0.3" />
+    </root>
+  </artifact>
+</component>
